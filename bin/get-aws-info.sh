@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # get-aws-info.sh - describes multiple AWS resource units in a single JSON
-# requires aws-cli to be installed on the system, and functional ~/.aws config files:
+# requires aws-cli to be installed on the system
 # 
 # aws-cli binaries need to be properly accessible in $PATH.
 # 
