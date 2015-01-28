@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 """aws-info: Parse select info from AWS (ec2, rds, elasticache, elb, cloudformation)"""
 
+# CHANGES: Header functionality has been DEPRECATED.
+# This has been moved to the /index.html page, which calls this script for 
+# the tables and appropraite other output. That's it.
+# Code is retained here but is currently disabled, and will probably
+# fail if used since the template no longer exists.
+
 import sys
 import subprocess
 import json
@@ -47,8 +53,8 @@ class AWSInfo:
 	def render(self):
 		"""Renders AWSInfo in HTML"""
 		sys.stdout.write("Content-Type: text/html\n\n")
-		# these are the only 2 we need to directly call here
-		self.render_header()
+		# render_header disabled as functionality has been moved
+		#self.render_header()
 		self.render_body()
 
 	def render_table(self, headers, rows):
@@ -291,18 +297,19 @@ class AWSInfo:
 	def render_body(self):
 		"""Renders the body - provides outer body, invokes jQuery accordion and calls sub-renderers"""
 
-		sys.stdout.write("{0}\n".format(self.template_page_heading))
-		sys.stdout.write("<div><p>Click an item to expand a section.<br></div>\n")
+		# Disable header and initial body functionality - content has been moved
+		#sys.stdout.write("{0}\n".format(self.template_page_heading))
+		#sys.stdout.write("<div><p>Click an item to expand a section.<br></div>\n")
 
 		# jQuery UI accordion element
 		sys.stdout.write('<div id="accordion">\n')
 		
 		# Call out to each specific template function
 		self.render_ec2()
-		self.render_rds()
-		self.render_elasticache()
-		self.render_elb()
-		self.render_cloudformation()
+		#self.render_rds()
+		#self.render_elasticache()
+		#self.render_elb()
+		#self.render_cloudformation()
 		self.render_json()
 		
 		# footer, end of document

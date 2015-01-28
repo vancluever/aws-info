@@ -1,0 +1,96 @@
+<html>
+<head>
+<title>AWS Infrastructure Display</title>
+<link href="js/ui/jquery-ui.min.css" rel="stylesheet">
+<link href="js/ui/jquery-ui.theme.min.css" rel="stylesheet">
+<style>
+
+
+body {
+	font-size: 62.5%;
+	font-family: Verdana,Arial,sans-serif;
+}
+table, th, td {
+        border: 1px solid black;
+}
+
+table {
+        border-collapse: collapse;
+	width: 100%
+}
+
+th, td {
+        padding: 5px;
+}
+
+tr:nth-child(even) {
+	background-color: #EEEEEE;
+}
+
+.ui-accordion-content {
+	margin-bottom: 1em;
+}
+
+.pagetop {
+        text-align: center;
+}
+
+.statusgreen {
+        background-color: green
+}
+.statusred {
+        background-color: red
+}
+
+.statustextred {
+	font-color: red
+}
+	
+</style>
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/ui/jquery-ui.min.js"></script>
+<script>
+$(function() {
+	$( "#accordion" ).accordion({
+		heightStyle: "content",
+		collapsible: true,
+		animate: false
+	})
+	$( "#progressbar" ).progressbar({
+		value: false
+		
+	});
+});
+$( document ).ready(function() {
+	$.get( "bin/aws-info.py", function( data ) {
+		// success
+		$( "#awsinfo-output" ).html( data );
+		$( "#accordion" ).accordion({
+			heightStyle: "content",
+			collapsible: true,
+			animate: false
+		})
+		//$( "#awsinfo-output" ).empty();
+		//$( "#awsinfo-output" ).append( data ); 
+	})
+	  .fail(function() {
+		$( "#awsinfo-output" ).empty();
+		$( "#awsinfo-output" ).append( '<h2 class="pagetop statustextred">Error loading content!</h2>' ); 
+	  })
+	$( "#accordion" ).accordion({
+		heightStyle: "content",
+		collapsible: true,
+		animate: false
+	})
+});	
+</script>
+</head>
+<body>
+<h1 class="pagetop">AWS Infrastructure Display</h1>
+<div class="pagetop"><p>Click an item to expand a section.<br></div>
+<div id="awsinfo-output">
+<h2 class="pagetop">Loading, please wait...</h2>
+<div id="progressbar"></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+Tue 27 Jan 2015 18:37:47 PST Chris Marchesi <inbox@vancluevertech.com>
+Re-tooling of the application. Several things fixed:
+  - Style has been fixed and looks a lot better and is more functional.
+  - Most content has been moved to an index page in the application root.
+  - Deprecated header templating and what not in the python script,
+  aws-info.py now is mainly just the table/accordion renderer.
+  - index.html page now will dynamically load the content and will give a
+  "waiting..." type message while the script is being called.
+  - Proper handling of error situations for the above and the python script
+  are currently a WIP, and you may get a WSOD on the bottom if the script
+  fails, or partial content.
+  - Finally, cleaned up jQuery UI content and removed unnecessary files.
+
