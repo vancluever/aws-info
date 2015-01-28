@@ -50,7 +50,7 @@ You can then run the script by navigating to http://HTTPHOST/content/.
 ### Running locally
 
 Since some of the recent changes, the role the python script plays
-directly have been reduced, but you can still see raw table output
+directly has been reduced, but you can still see raw table output
 rendered by running the python script locally:
 
     ./aws-info.py > output.html
