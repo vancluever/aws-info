@@ -306,10 +306,10 @@ class AWSInfo:
 		
 		# Call out to each specific template function
 		self.render_ec2()
-		#self.render_rds()
-		#self.render_elasticache()
-		#self.render_elb()
-		#self.render_cloudformation()
+		self.render_rds()
+		self.render_elasticache()
+		self.render_elb()
+		self.render_cloudformation()
 		self.render_json()
 		
 		# footer, end of document
