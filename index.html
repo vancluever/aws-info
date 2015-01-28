@@ -51,11 +51,6 @@ tr:nth-child(even) {
 <script src="js/ui/jquery-ui.min.js"></script>
 <script>
 $(function() {
-	$( "#accordion" ).accordion({
-		heightStyle: "content",
-		collapsible: true,
-		animate: false
-	})
 	$( "#progressbar" ).progressbar({
 		value: false
 		
@@ -70,12 +65,9 @@ $( document ).ready(function() {
 			collapsible: true,
 			animate: false
 		})
-		//$( "#awsinfo-output" ).empty();
-		//$( "#awsinfo-output" ).append( data ); 
 	})
 	  .fail(function() {
-		$( "#awsinfo-output" ).empty();
-		$( "#awsinfo-output" ).append( '<h2 class="pagetop statustextred">Error loading content!</h2>' ); 
+		$( "#awsinfo-output" ).html( '<h2 class="pagetop statustextred">Error loading content!</h2>' ); 
 	  })
 	$( "#accordion" ).accordion({
 		heightStyle: "content",
