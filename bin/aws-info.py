@@ -10,6 +10,7 @@
 import sys
 import subprocess
 import json
+import StringIO
 
 class MyError(Exception):
 	def __init__(self, value):
@@ -24,17 +25,13 @@ class AWSInfo:
 	template_table_greenstatus = '<td class="statusgreen">'
 	template_table_redstatus = '<td class="statusred">'
 	
-	# Heading of webpage
-	template_page_heading = '<h1 class="pagetop">AWS Infrastructure Display</h1>'
-
-	# location for template files
-	template_header_file = "../templates/header.html.template"
-
 	# path to JSON grabber
 	json_shell_path = './get-aws-info.sh'
 	awsinfo_raw_data = ''
 	awsinfo_raw_parsed = {}
 	awsinfo_parsed_data = {}
+	# resposne body - set up as a StringIO object in response()
+	response_body = None
 	
 
 	def __init__(self, **kwargs):
@@ -50,12 +47,12 @@ class AWSInfo:
 			# saves having to deal with a ton of nesting/iterating later
 			self.awsinfo_parsed_data[item['entity']] = item['data']
 
-	def render(self):
+	def response(self):
 		"""Renders AWSInfo in HTML"""
-		sys.stdout.write("Content-Type: text/html\n\n")
-		# render_header disabled as functionality has been moved
-		#self.render_header()
+		self.response_body = StringIO.StringIO()
+		self.response_body.write("Content-Type: text/html\n\n")
 		self.render_body()
+		return self.response_body.getvalue()
 
 	def render_table(self, headers, rows):
 		"""Renders a table in page, renders headers along with status fields highlighted"""
@@ -70,31 +67,37 @@ class AWSInfo:
 		#        status: flag to highlight status data (0 = off 1 = green 2 = red)
 		
 		# render <table> and header data
-		sys.stdout.write("<table>\n\t<tr>")
+		self.response_body.write("<table>\n\t<tr>")
 		for header in headers:
-			sys.stdout.write("<th>{0}</th>".format(header))
-		sys.stdout.write("</tr>\n")
-		# render rows
-		for row in rows:
-			sys.stdout.write("\t<tr>")
-			for header in headers:
-				if row[header]['status'] == 1:
-					# green status
-					sys.stdout.write("{0}{1}</td>".format(self.template_table_greenstatus, row[header]['data']))
-				elif row[header]['status'] == 2:
-					# red status
-					sys.stdout.write("{0}{1}</td>".format(self.template_table_redstatus, row[header]['data']))
-				else:
-					# regular column
-					sys.stdout.write("<td>{0}</td>".format(row[header]['data']))
-			# row finished
-			sys.stdout.write("</tr>\n")
+			self.response_body.write("<th>{0}</th>".format(header))
+		self.response_body.write("</tr>\n")
+		# add a single "no results" row if there is nothing to write
+		if len(rows) <= 0:
+				self.response_body.write("\t<tr>")
+				self.response_body.write('<td colspan="{0}" class="noresult">No results to display</td>'.format(len(headers)))
+				self.response_body.write("</tr>\n")
+		else:
+			# render rows
+			for row in rows:
+				self.response_body.write("\t<tr>")
+				for header in headers:
+					if row[header]['status'] == 1:
+						# green status
+						self.response_body.write("{0}{1}</td>".format(self.template_table_greenstatus, row[header]['data']))
+					elif row[header]['status'] == 2:
+						# red status
+						self.response_body.write("{0}{1}</td>".format(self.template_table_redstatus, row[header]['data']))
+					else:
+						# regular column
+						self.response_body.write("<td>{0}</td>".format(row[header]['data']))
+				# row finished
+				self.response_body.write("</tr>\n")
 		# table finished
-		sys.stdout.write("</table>\n")
+		self.response_body.write("</table>\n")
 	
 	def render_preformatted(self, text):
 		"""Renders a paragraph."""
-		sys.stdout.write("<pre>{0}</pre>".format(text))
+		self.response_body.write("<pre>{0}</pre>".format(text))
 	
 	def render_header(self):
 		"""Renders the HTML header, includes include links to any CSS and JS"""
@@ -106,7 +109,7 @@ class AWSInfo:
 			raise MyError(''.join([e.strerror, ': ', e.filename], ''))
 		# load template data and render
 		data = handle_template_header.readlines()
-		sys.stdout.write(''.join(data))
+		self.response_body.write(''.join(data))
 		handle_template_header.close()
 	
 	def render_ec2(self):
@@ -158,7 +161,7 @@ class AWSInfo:
 				table_rows.append(row)
 		# finished
 		# render heading
-		sys.stdout.write("<h3>EC2 Instances - {0} Items</h3>\n".format(len(table_rows)))
+		self.response_body.write("<h3>EC2 Instances - {0} Items</h3>\n".format(len(table_rows)))
 		self.render_table(table_header, table_rows)
 
 	def render_rds(self):
@@ -193,7 +196,7 @@ class AWSInfo:
 			table_rows.append(row)
 		# finished
 		# render heading
-		sys.stdout.write("<h3>RDS Instances - {0} Items</h3>\n".format(len(table_rows)))
+		self.response_body.write("<h3>RDS Instances - {0} Items</h3>\n".format(len(table_rows)))
 		self.render_table(table_header, table_rows)
 		
 
@@ -226,7 +229,7 @@ class AWSInfo:
 			table_rows.append(row)
 		# finished
 		# render heading
-		sys.stdout.write("<h3>ElastiCache Instances - {0} Items</h3>\n".format(len(table_rows)))
+		self.response_body.write("<h3>ElastiCache Instances - {0} Items</h3>\n".format(len(table_rows)))
 		self.render_table(table_header, table_rows)
 
 	def render_elb(self):
@@ -252,7 +255,7 @@ class AWSInfo:
 			table_rows.append(row)
 		# finished
 		# render heading
-		sys.stdout.write("<h3>Elastic Load Balancers - {0} Items</h3>\n".format(len(table_rows)))
+		self.response_body.write("<h3>Elastic Load Balancers - {0} Items</h3>\n".format(len(table_rows)))
 		self.render_table(table_header, table_rows)
 
 	def render_cloudformation(self):
@@ -284,25 +287,21 @@ class AWSInfo:
 			table_rows.append(row)
 		# finished
 		# render heading
-		sys.stdout.write("<h3>CloudFormation Stacks - {0} Items</h3>\n".format(len(table_rows)))
+		self.response_body.write("<h3>CloudFormation Stacks - {0} Items</h3>\n".format(len(table_rows)))
 		self.render_table(table_header, table_rows)
 		
 
 	def render_json(self):
 		"""Renders the original JSON looking all pretty like"""
 		# not much to this function.
-		sys.stdout.write("<h3>Original JSON</h3>\n")
+		self.response_body.write("<h3>Original JSON</h3>\n")
 		self.render_preformatted(json.dumps(self.awsinfo_raw_parsed, indent=4, separators=(',', ': ')))
 
 	def render_body(self):
 		"""Renders the body - provides outer body, invokes jQuery accordion and calls sub-renderers"""
 
-		# Disable header and initial body functionality - content has been moved
-		#sys.stdout.write("{0}\n".format(self.template_page_heading))
-		#sys.stdout.write("<div><p>Click an item to expand a section.<br></div>\n")
-
 		# jQuery UI accordion element
-		sys.stdout.write('<div id="accordion">\n')
+		self.response_body.write('<div id="accordion">\n')
 		
 		# Call out to each specific template function
 		self.render_ec2()
@@ -313,13 +312,13 @@ class AWSInfo:
 		self.render_json()
 		
 		# footer, end of document
-		sys.stdout.write("</div>\n</body>\n</html>\n")
+		self.response_body.write("</div>\n</body>\n</html>\n")
 
 
 if __name__ == "__main__":
 	# init object
 	aws_info = AWSInfo()
 	# render
-	aws_info.render()
+	sys.stdout.write(aws_info.response())
 	# profit?
 

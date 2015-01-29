@@ -1,3 +1,8 @@
+Wed 28 Jan 2015 20:11:58 PST Chris Marchesi <inbox@vancluevertech.com>
+  - Error messages in page work now (output is now buffered before response
+  is sent)
+  - Tables will now show "no results..." message when there are no results
+
 Tue 27 Jan 2015 18:37:47 PST Chris Marchesi <inbox@vancluevertech.com>
 Re-tooling of the application. Several things fixed:
   - Style has been fixed and looks a lot better and is more functional.
